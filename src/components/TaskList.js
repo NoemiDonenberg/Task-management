@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import Task from "../models/Task";
 import AddTask from "./AddTask";
-import EditTask from "./EditTask"; // ייבוא קומפוננטת עריכת משימה
+import EditTask from "./EditTask";
 
 function TaskList() {
   const [tasks, setTasks] = useState([
     new Task(1, "ללמוד React", "2025-01-27"),
     new Task(2, "לסיים פרויקט", "2025-01-28"),
   ]);
-  const [editingTask, setEditingTask] = useState(null); // המשימה הנוכחית שמעורכת
+  const [editingTask, setEditingTask] = useState(null);
 
   // פונקציה להוספת משימה
   const addTask = (description) => {
@@ -32,7 +32,15 @@ function TaskList() {
       task.id === id ? { ...task, description: newDescription } : task
     );
     setTasks(updatedTasks);
-    setEditingTask(null); // סיום העריכה
+    setEditingTask(null);
+  };
+
+  // פונקציה לסימון משימה כהושלמה או לביטול סימון
+  const toggleTaskCompletion = (id) => {
+    const updatedTasks = tasks.map((task) =>
+      task.id === id ? { ...task, completed: !task.completed } : task
+    );
+    setTasks(updatedTasks);
   };
 
   return (
@@ -43,12 +51,17 @@ function TaskList() {
         <EditTask
           task={editingTask}
           onSave={saveTask}
-          onCancel={() => setEditingTask(null)} // ביטול העריכה
+          onCancel={() => setEditingTask(null)}
         />
       )}
       <ul>
         {tasks.map((task) => (
-          <li key={task.id}>
+          <li key={task.id} style={{ textDecoration: task.completed ? "line-through" : "none" }}>
+            <input
+              type="checkbox"
+              checked={task.completed}
+              onChange={() => toggleTaskCompletion(task.id)}
+            />
             <strong>{task.description}</strong> - {task.date}
             <button onClick={() => deleteTask(task.id)}>מחיקה</button>
             <button onClick={() => setEditingTask(task)}>עריכה</button>
